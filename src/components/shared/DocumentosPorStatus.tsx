@@ -95,7 +95,10 @@ export default function DocumentosPorStatus({getData}: Props) {
       // Se não houver seleção, soma todos os valores
       setTotalDocumentos(data.reduce((acc, item) => acc + item.value, 0));
     }
-  }, [selectedItem, data]); // Dependências: atualiza sempre que selectedItem ou data mudar
+    if(dataItemFilter){
+      montarGrafico(dataItemFilter)
+    }
+  }, [selectedItem, dataItemFilter]); // Dependências: atualiza sempre que selectedItem ou data mudar
   
 
   const chartConfig = {
