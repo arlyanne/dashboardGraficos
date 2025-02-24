@@ -31,7 +31,7 @@ export default function DocumentosTabela({getData}: Props) {
   async function DadosPlanilhaCompletos() {
     const response = await getData('', '', '');
     setDataItemFilter(response)
-    console.log(dataItemFilter)
+   
     
   }
 
@@ -48,6 +48,7 @@ export default function DocumentosTabela({getData}: Props) {
 
   useEffect(() => {
     DadosPlanilhaCompletos();
+    console.log(DadosPlanilhaCompletos)
   }, []);
 
   useEffect(() => {

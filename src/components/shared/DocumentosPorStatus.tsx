@@ -42,7 +42,7 @@ export default function DocumentosPorStatus({getData}: Props) {
   
     const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({ 
       name, 
-      value: value as number // Asserção de tipo para garantir que 'value' seja tratado como 'number'
+      value: value as number 
     }));
 
     const totalDocumentos = lista.reduce(
@@ -76,6 +76,7 @@ export default function DocumentosPorStatus({getData}: Props) {
       resp = await getData(nome, '', '');
       setSelectedItem(nome)
     }
+    
   
     setDataItemFilter(resp); // Atualiza a variável global do contexto
   
@@ -83,6 +84,7 @@ export default function DocumentosPorStatus({getData}: Props) {
     // e chamar setSelectedItem apenas depois que dataItemFilter for atualizado
     if (selectedItem !== nome) {
       setSelectedItem(nome); // Atualiza o item selecionado
+      
     }
   }
 
@@ -96,6 +98,7 @@ export default function DocumentosPorStatus({getData}: Props) {
       setTotalDocumentos(data.reduce((acc, item) => acc + item.value, 0));
     }
   }, [selectedItem, data]); // Dependências: atualiza sempre que selectedItem ou data mudar
+  console.log("Resposta completa:", selectedItem);
   
 
   const chartConfig = {
