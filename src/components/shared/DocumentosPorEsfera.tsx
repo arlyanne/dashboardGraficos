@@ -1,4 +1,4 @@
-import { useState, useEffect, JSX } from "react";
+import { useState, useEffect} from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, CartesianGrid, LabelList, Cell } from "recharts";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -13,12 +13,13 @@ interface Props {
   getData: (status: string, esfera: string, cnpj: string) => any
 }
 
-export default function DocumentosPorEsfera({getData}: Props): JSX.Element { 
+export default function DocumentosPorEsfera({getData}: Props) { 
   const [data, setData] = useState<DataItem[]>([]);
   const { selectedItem, setSelectedItem } = useSelection();
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaEsfera() {
+
     try {
       const response = await getData("", "", "");
       setDataItemFilter(response);
@@ -68,7 +69,7 @@ export default function DocumentosPorEsfera({getData}: Props): JSX.Element {
 
   const chartConfig = {
     QUANTIDADE: {
-      label: "QUANTIDADE",
+      label: "NOME_COMPLETO",
     },
   } satisfies ChartConfig;
 
@@ -106,7 +107,7 @@ export default function DocumentosPorEsfera({getData}: Props): JSX.Element {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="value"
+              dataKey="name"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
