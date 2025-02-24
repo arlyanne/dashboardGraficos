@@ -26,14 +26,27 @@ interface DataItem {
 
 export default function DocumentosTabela({getData}: Props) {
   const [data, setData] = useState<DataItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false); // Estado para controle de loading
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
-  async function DadosPlanilhaCompletos() {
+ async function DadosPlanilhaCompletos() {
+  if (isLoading) return; // Evita chamadas simultâneas
+  console.log("Iniciando requisição...");
+  setIsLoading(true);
+  try {
     const response = await getData('', '', '');
-    setDataItemFilter(response)
-   
-    
+    if (response) {
+      console.log("Resposta da API:", response);
+      setDataItemFilter(response);
+    } else {
+      console.error("A resposta da API foi indefinida");
+    }
+  } catch (error) {
+    console.error("Erro ao buscar os dados", error);
+  } finally {
+    setIsLoading(false);
   }
+}
 
   function formatarData(dataString: string): string {
     if (!dataString) return "";
@@ -47,12 +60,13 @@ export default function DocumentosTabela({getData}: Props) {
   }
 
   useEffect(() => {
+    console.log("Chamando dadosPlanilhaCompletos")
     DadosPlanilhaCompletos();
-    console.log(DadosPlanilhaCompletos)
   }, []);
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
+      console.log("Atualizando os dados...");
       const formattedData = dataItemFilter.map((item: any) => ({
         CNPJ: item.CNPJ,
         DOC: item.DOC,

@@ -76,16 +76,8 @@ export default function DocumentosPorStatus({getData}: Props) {
       resp = await getData(nome, '', '');
       setSelectedItem(nome)
     }
-    
   
     setDataItemFilter(resp); // Atualiza a variável global do contexto
-  
-    // useEffect separado para monitorar selectedItem e dataItemFilter
-    // e chamar setSelectedItem apenas depois que dataItemFilter for atualizado
-    if (selectedItem !== nome) {
-      setSelectedItem(nome); // Atualiza o item selecionado
-      
-    }
   }
 
   useEffect(() => {

@@ -47,7 +47,7 @@ export default function ConformidadeLegal() {
             <DocumentosPorCnpj />
           </div>
           <div className="flex-1 h-full bg-white p-4 shadow rounded">
-            <DocumentosPorEsfera />
+            <DocumentosPorEsfera getData={getData} />
           </div>
         </div>
         <div className="grid grid-cols-1 gap-6 flex-grow">

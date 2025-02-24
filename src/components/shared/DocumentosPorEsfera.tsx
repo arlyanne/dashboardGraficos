@@ -1,89 +1,96 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, CartesianGrid, LabelList, Cell } from 'recharts';
-import { fetchQuery } from '@/lib/query';
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { useSelection } from '@/context/SelectionContext';
+import { useState, useEffect, JSX } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, CartesianGrid, LabelList, Cell } from "recharts";
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useSelection } from "@/context/SelectionContext";
 
 interface DataItem {
-  NOME_COMPLETO: string;
-  QUANTIDADE: number;
+  name: string;
+  value: number;
 }
 
-export default function DocumentoPorEsfera() {
+interface Props {
+  getData: (status: string, esfera: string, cnpj: string) => any
+}
+
+export default function DocumentosPorEsfera({getData}: Props): JSX.Element { 
   const [data, setData] = useState<DataItem[]>([]);
   const { selectedItem, setSelectedItem } = useSelection();
+  const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaEsfera() {
-    let consulta = `
-        SELECT 
-            T.ESFERA, 
-            T.NOME_COMPLETO, 
-            T.QUANTIDADE 
-        FROM  
-            ( 
-                SELECT  
-                    ESFERA,  
-                    SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'ESFERA', ESFERA) AS NOME_COMPLETO,  
-                    COUNT(*) AS QUANTIDADE 
-                FROM  
-                    AD_TGFASSUNTOREG 
-                GROUP BY  
-                    ESFERA,  
-                    SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'ESFERA', ESFERA) 
-            ) T 
-        ORDER BY  
-            T.QUANTIDADE DESC 
-    `;
     try {
-      const response = await fetchQuery(consulta);
-      if (response && response.length > 0) {
-        const chartData = response.map((item: DataItem) => ({
-          NOME_COMPLETO: item.NOME_COMPLETO,
-          QUANTIDADE: item.QUANTIDADE,
-        }));
-
-        setData(chartData);
-      }
+      const response = await getData("", "", "");
+      setDataItemFilter(response);
     } catch (error) {
       console.error('Erro ao buscar dados', error);
     }
+  }
+
+  function mostrarGrafico(filter: any) {
+    const contagem = filter.reduce((acc: any, { NOME_COMPLETO }: any) => {
+      acc[NOME_COMPLETO] = (acc[NOME_COMPLETO] || 0) + 1;
+      return acc;
+    }, {});
+
+    const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({
+      name,
+      value: value as number,
+    }));
+
+    setData(lista);
   }
 
   useEffect(() => {
     consultaEsfera();
   }, []);
 
-  const handleClick = (data: any) => {
-    if (selectedItem === data.NOME_COMPLETO) {
+  useEffect(() => {
+    if (dataItemFilter && dataItemFilter.length > 0) {
+      mostrarGrafico(dataItemFilter);
+    }
+  }, [dataItemFilter, selectedItem]);
+
+  async function handleClick(data: any) {
+    const nome = data.name;
+    let resp;
+
+    if (selectedItem === nome) {
+      resp = await getData('', '', '');
       setSelectedItem(undefined);
     } else {
-      setSelectedItem(data.NOME_COMPLETO);
+      resp = await getData(nome, '', '');
+      setSelectedItem(nome);
     }
-  };
+
+    setDataItemFilter(resp); // Atualiza a variável global do contexto
+  }
 
   const chartConfig = {
-    desktop: {
-      label: 'QUANTIDADE',
-      color: 'hsl(var(--chart-1))',
+    QUANTIDADE: {
+      label: "QUANTIDADE",
     },
   } satisfies ChartConfig;
 
   const colors = [
-    '#8884d8',
-    '#82ca9d',
-    '#ffc658',
-    '#ff8042',
-    '#8dd1e1',
-    '#a4de6c',
-    '#d0ed57',
-    '#f4e1d2',
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff8042",
+    "#8dd1e1",
+    "#a4de6c",
+    "#d0ed57",
+    "#f4e1d2",
   ];
 
-  const filteredData = selectedItem ? data.filter(item => item.NOME_COMPLETO === selectedItem) : data;
-  const selectedColor = selectedItem ? colors[data.findIndex(item => item.NOME_COMPLETO === selectedItem) % colors.length] : colors[0];
-
-
+  const filteredData = selectedItem
+    ? data.filter((item) => item.name === selectedItem)
+    : data;
+  const selectedColor = selectedItem
+    ? colors[
+        data.findIndex((item) => item.name === selectedItem) % colors.length
+      ]
+    : colors[0];
 
   return (
     <Card>
@@ -91,20 +98,15 @@ export default function DocumentoPorEsfera() {
         <CardTitle>Documentos por Esfera</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
+        <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <BarChart
             accessibilityLayer
             data={filteredData}
-            margin={{
-              top: 20,
-            }}
+            margin={{ top: 20 }}
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="NOME_COMPLETO"
+              dataKey="value"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
@@ -112,24 +114,20 @@ export default function DocumentoPorEsfera() {
                 value.length > 10 ? `${value.slice(0, 10)}...` : value
               }
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
 
-            <Bar dataKey="QUANTIDADE" onClick={(entry) => handleClick(entry)}>
-              {filteredData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={selectedItem === entry.NOME_COMPLETO ? selectedColor ?? colors[index % colors.length] : colors[index % colors.length]} 
+            <Bar dataKey="value" onClick={(entry) => handleClick(entry)}>
+              {filteredData.map((entry: any, index: any) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={
+                    selectedItem === entry.name
+                      ? selectedColor ?? colors[index % colors.length]
+                      : colors[index % colors.length]
+                  }
                 />
               ))}
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
+              <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
             </Bar>
           </BarChart>
         </ChartContainer>
