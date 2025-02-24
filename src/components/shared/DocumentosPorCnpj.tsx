@@ -28,7 +28,7 @@ interface Props {
 
 export default function ConsultaPorCNPJ({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
-  const { selectedItem, setSelectedItem } = useSelection();
+  const [ selectedItem, setSelectedItem ] = useState<string>('');
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaCNPJ() {
@@ -70,7 +70,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
 
     if (selectedItem === nome) {
       resp = await getData("", "", "");
-      setSelectedItem(undefined);
+      setSelectedItem('');
     } else {
       resp = await getData("", "", nome);
       setSelectedItem(nome);
@@ -82,14 +82,6 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   const chartConfig = {
     CNPJ: {
       label: "CNPJ",
-      color: "hsl(var(--chart-1))",
-    },
-    QUANTIDADE: {
-      label: "QUANTIDADE",
-      color: "hsl(var(--chart-2))",
-    },
-    label: {
-      color: "hsl(var(--background))",
     },
   } satisfies ChartConfig;
 
@@ -148,7 +140,7 @@ const selectedColor = selectedItem
             <Bar
               dataKey="name"
               layout="vertical"
-              fill="var(--color-QUANTIDADE)"
+              fill="var(--color-CNPJ)"
               radius={4}
               onClick={(entry) => handleClick(entry)}
             >

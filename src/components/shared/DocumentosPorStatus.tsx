@@ -21,7 +21,7 @@ interface Props {
 export default function DocumentosPorStatus({getData}: Props) {
   const [data, setData] = useState<DataItem[]>([]);
   const [totalDocumentos, setTotalDocumentos] = useState(0);
-  const { selectedItem, setSelectedItem } = useSelection();
+  const [ selectedItem, setSelectedItem ] = useState<string>('');
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function dadosStatusTotal() {
@@ -71,7 +71,7 @@ export default function DocumentosPorStatus({getData}: Props) {
   
     if (selectedItem === nome) {
       resp = await getData('', '', '');
-      setSelectedItem(undefined);
+      setSelectedItem('');
     } else {
       resp = await getData(nome, '', '');
       setSelectedItem(nome)
