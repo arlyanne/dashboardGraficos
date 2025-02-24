@@ -51,7 +51,7 @@ export default function DocumentosPorEsfera({getData}: Props) {
       console.log(dataItemFilter)
       mostrarGrafico(dataItemFilter);
     }
-  }, [dataItemFilter]);
+  }, [dataItemFilter, selectedItem]);
 
   async function handleClick(data: any) {
     const nome = data.name;
