@@ -44,7 +44,7 @@ export default function ConformidadeLegal() {
             <DocumentosPorStatus getData={getData} />
           </div>
           <div className="flex-1 h-full bg-white p-4 shadow rounded">
-            <DocumentosPorCnpj />
+            <DocumentosPorCnpj getData={getData} />
           </div>
           <div className="flex-1 h-full bg-white p-4 shadow rounded">
             <DocumentosPorEsfera getData={getData} />
