@@ -15,7 +15,7 @@ interface Props {
 
 export default function DocumentosPorEsfera({getData}: Props) { 
   const [data, setData] = useState<DataItem[]>([]);
-  const { selectedItem, setSelectedItem } = useSelection();
+  const [ selectedItem, setSelectedItem ] = useState<string>('');
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaEsfera() {
@@ -48,9 +48,10 @@ export default function DocumentosPorEsfera({getData}: Props) {
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
+      console.log(dataItemFilter)
       mostrarGrafico(dataItemFilter);
     }
-  }, [dataItemFilter, selectedItem]);
+  }, [dataItemFilter]);
 
   async function handleClick(data: any) {
     const nome = data.name;
@@ -58,9 +59,9 @@ export default function DocumentosPorEsfera({getData}: Props) {
 
     if (selectedItem === nome) {
       resp = await getData('', '', '');
-      setSelectedItem(undefined);
+      setSelectedItem('');
     } else {
-      resp = await getData(nome, '', '');
+      resp = await getData('', nome, '');
       setSelectedItem(nome);
     }
 
@@ -93,6 +94,7 @@ export default function DocumentosPorEsfera({getData}: Props) {
       ]
     : colors[0];
 
+    
   return (
     <Card>
       <CardHeader className="items-center pb-0">

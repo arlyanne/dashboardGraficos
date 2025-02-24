@@ -90,7 +90,6 @@ export default function DocumentosPorStatus({getData}: Props) {
       setTotalDocumentos(data.reduce((acc, item) => acc + item.value, 0));
     }
   }, [selectedItem, data]); // Dependências: atualiza sempre que selectedItem ou data mudar
-  console.log("Resposta completa:", selectedItem);
   
 
   const chartConfig = {
