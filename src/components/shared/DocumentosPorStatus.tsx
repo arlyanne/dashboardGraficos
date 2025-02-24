@@ -71,18 +71,32 @@ export default function DocumentosPorStatus({getData}: Props) {
   
     if (selectedItem === nome) {
       resp = await getData('', '', '');
+      setSelectedItem(undefined);
     } else {
       resp = await getData(nome, '', '');
+      setSelectedItem(nome)
     }
   
     setDataItemFilter(resp); // Atualiza a variável global do contexto
   
-    // Utilize um useEffect separado para monitorar selectedItem e dataItemFilter
+    // useEffect separado para monitorar selectedItem e dataItemFilter
     // e chamar setSelectedItem apenas depois que dataItemFilter for atualizado
     if (selectedItem !== nome) {
       setSelectedItem(nome); // Atualiza o item selecionado
     }
   }
+
+  useEffect(() => {
+    if (selectedItem) {
+      // Se houver um item selecionado, pega apenas o valor desse item
+      const selectedData = data.find((item) => item.name === selectedItem);
+      setTotalDocumentos(selectedData ? selectedData.value : 0);
+    } else {
+      // Se não houver seleção, soma todos os valores
+      setTotalDocumentos(data.reduce((acc, item) => acc + item.value, 0));
+    }
+  }, [selectedItem, data]); // Dependências: atualiza sempre que selectedItem ou data mudar
+  
 
   const chartConfig = {
     QUANTIDADE: {
