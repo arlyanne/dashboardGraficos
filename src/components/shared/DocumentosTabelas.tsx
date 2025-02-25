@@ -26,12 +26,11 @@ interface DataItem {
 
 export default function DocumentosTabela({getData}: Props) {
   const [data, setData] = useState<DataItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false); // Estado para controle de loading
+  const [isLoading, setIsLoading] = useState(false); 
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
  async function DadosPlanilhaCompletos() {
   if (isLoading) return; // Evita chamadas simultâneas
-  console.log("Iniciando requisição...");
   setIsLoading(true);
   try {
     const response = await getData('', '', '');
@@ -60,13 +59,11 @@ export default function DocumentosTabela({getData}: Props) {
   }
 
   useEffect(() => {
-    console.log("Chamando dadosPlanilhaCompletos")
     DadosPlanilhaCompletos();
   }, []);
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
-      console.log("Atualizando os dados...");
       const formattedData = dataItemFilter.map((item: any) => ({
         CNPJ: item.CNPJ,
         DOC: item.DOC,

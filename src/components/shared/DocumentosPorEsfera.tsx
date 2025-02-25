@@ -48,7 +48,6 @@ export default function DocumentosPorEsfera({getData}: Props) {
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
-      console.log(dataItemFilter)
       mostrarGrafico(dataItemFilter);
     }
   }, [dataItemFilter, selectedItem]);

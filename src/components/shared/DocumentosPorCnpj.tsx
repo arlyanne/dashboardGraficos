@@ -56,7 +56,8 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
 
   useEffect(() => {
     consultaCNPJ();
-  });
+  }, []);  
+
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
