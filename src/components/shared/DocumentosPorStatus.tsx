@@ -109,6 +109,7 @@ export default function DocumentosPorStatus({ getData }: Props) {
   const filteredData = selectedItem
     ? data.filter((item) => item.name === selectedItem)
     : data;
+
   const selectedColor = selectedItem
     ? colors[
         data.findIndex((item) => item.name === selectedItem) % colors.length
@@ -117,10 +118,10 @@ export default function DocumentosPorStatus({ getData }: Props) {
 
   return (
     <Card>
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Documentos por Status</CardTitle>
+      <CardHeader className="items-center pb-4">
+        <CardTitle className="text-x1 font-semibold">Documentos por Status</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="flex-1 pb-4 pt-4">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
@@ -141,10 +142,9 @@ export default function DocumentosPorStatus({ getData }: Props) {
               {filteredData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={
-                    selectedItem === entry.name
-                      ? selectedColor ?? colors[index % colors.length]
-                      : colors[index % colors.length]
+                  fill={selectedItem === entry.name 
+                    ? selectedColor ?? colors[index % colors.length]  // Cor do item selecionado
+                    : colors[index % colors.length]  // Cor do item não selecionado
                   }
                 />
               ))}
@@ -180,14 +180,14 @@ export default function DocumentosPorStatus({ getData }: Props) {
             </Pie>
           </PieChart>
         </ChartContainer>
-        <div className="text-sm mt-2 grid grid-cols-3 gap-1">
+        <div className="text-sm mt-4 grid grid-cols-3 gap-4">
           {filteredData.slice(0, 3).map((entry, index) => (
             <div
               key={`legend-${index}`}
               className="flex items-center space-x-2"
             >
               <div
-                className="w-4 h-4"
+                className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: colors[index % colors.length] }}
               ></div>
               <span>
@@ -195,14 +195,14 @@ export default function DocumentosPorStatus({ getData }: Props) {
               </span>
             </div>
           ))}
-          <div className="col-span-3 flex justify-center space-x-8 mt-2">
+          <div className="col-span-3 flex justify-center space-x-8 mt-4">
             {filteredData.slice(3).map((entry, index) => (
               <div
                 key={`legend-${index + 3}`}
                 className="flex items-center space-x-2"
               >
                 <div
-                  className="w-4 h-4"
+                  className="w-4 h-4 rounded-full"
                   style={{
                     backgroundColor: colors[(index + 3) % colors.length],
                   }}
