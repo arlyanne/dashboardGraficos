@@ -81,8 +81,8 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   }
 
   const chartConfig = {
-    CNPJ: {
-      label: "CNPJ",
+    QUANTIDADE: {
+      label: "QUANTIDADE",
     },
   } satisfies ChartConfig;
 
@@ -133,15 +133,15 @@ const selectedColor = selectedItem
               tickFormatter={(value) => value.slice(0, 3)}
               hide
             />
-            <XAxis dataKey="name" type="number" hide />
+            <XAxis dataKey="value" type="number" hide />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
             <Bar
-              dataKey="name"
+              dataKey="value"
               layout="vertical"
-              fill="var(--color-CNPJ)"
+              // fill="var(--color-QUANTIDADE)"
               radius={4}
               onClick={(entry) => handleClick(entry)}
             >
@@ -156,14 +156,14 @@ const selectedColor = selectedItem
                 />
               ))}
               <LabelList
-                dataKey="CNPJ"
+                dataKey="name"
                 position="insideLeft"
                 offset={8}
-                className="fill-[--color-label]"
+                className="fill-[--color-CNPJ]"
                 fontSize={10}
               />
               <LabelList
-                dataKey="QUANTIDADE"
+                dataKey="value"
                 position="right"
                 offset={8}
                 className="fill-foreground"
