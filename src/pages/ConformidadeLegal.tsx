@@ -28,6 +28,7 @@ export default function ConformidadeLegal() {
         `;
     try {
       const response = await fetchQuery(consulta);
+      console.log("Dados recebidos:", response)
       return response;
     } catch (error) {
       console.error("Erro ao buscar os dados", error);

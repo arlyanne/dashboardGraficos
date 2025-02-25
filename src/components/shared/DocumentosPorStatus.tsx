@@ -27,6 +27,7 @@ export default function DocumentosPorStatus({ getData }: Props) {
   async function dadosStatusTotal() {
     try {
       const response = await getData("", "", "");
+      console.log("Dados completos recebidos:", response); 
       setDataItemFilter(response);
     } catch (error) {
       console.error("Erro ao buscar os dados", error);
@@ -43,6 +44,8 @@ export default function DocumentosPorStatus({ getData }: Props) {
       name,
       value: value as number,
     }));
+
+    console.log("Dados formatados para o gráfico:", lista); // <-- E aqui
 
     const totalDocumentos = lista.reduce(
       (acc: number, item: DataItem) => acc + item.value,
