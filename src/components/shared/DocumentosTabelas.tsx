@@ -29,33 +29,22 @@ export default function DocumentosTabela({getData}: Props) {
   const [isLoading, setIsLoading] = useState(false); 
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
- async function DadosPlanilhaCompletos() {
-  if (isLoading) return; // Evita chamadas simultâneas
-  setIsLoading(true);
-  try {
-    const response = await getData('', '', '');
-    if (response) {
-      console.log("Resposta da API:", response);
-      setDataItemFilter(response);
-    } else {
-      console.error("A resposta da API foi indefinida");
+  async function DadosPlanilhaCompletos() {
+    if (isLoading) return; // Evita chamadas simultâneas
+    setIsLoading(true); // Inicia o carregamento
+    try {
+      const response = await getData('', '', '');
+      if (response) {
+        
+        setDataItemFilter(response);
+      } else {
+        console.error("A resposta da API foi indefinida");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar os dados:", error);
+    } finally {
+      setIsLoading(false); // Finaliza o carregamento
     }
-  } catch (error) {
-    console.error("Erro ao buscar os dados", error);
-  } finally {
-    setIsLoading(false);
-  }
-}
-
-  function formatarData(dataString: string): string {
-    if (!dataString) return "";
-    const dia = dataString.slice(0, 2);
-    const mes = dataString.slice(2, 4);
-    const ano = dataString.slice(4, 8);
-    const hora = dataString.slice(9, 11);
-    const minuto = dataString.slice(12, 14);
-    const segundo = dataString.slice(15, 17);
-    return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
   }
 
   useEffect(() => {
@@ -64,6 +53,7 @@ export default function DocumentosTabela({getData}: Props) {
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
+      console.log("Dados recebidos para a tabela:", dataItemFilter);
       const formattedData = dataItemFilter.map((item: any) => ({
         CNPJ: item.CNPJ,
         DOC: item.DOC,
@@ -76,7 +66,19 @@ export default function DocumentosTabela({getData}: Props) {
       }));
       setData(formattedData);
     }
-  }, [dataItemFilter]);
+  }, [dataItemFilter]); // Quando dataItemFilter mudar, atualizar os dados
+
+  function formatarData(dataString: string): string {
+    if (!dataString) return "";
+    const dia = dataString.slice(0, 2);
+    const mes = dataString.slice(2, 4);
+    const ano = dataString.slice(4, 8);
+    const hora = dataString.slice(9, 11);
+    const minuto = dataString.slice(12, 14);
+    const segundo = dataString.slice(15, 17);
+    return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
+  }
+
 
   return (
     <Table className="table-auto">

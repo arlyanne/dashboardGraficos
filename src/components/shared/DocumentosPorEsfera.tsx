@@ -15,7 +15,7 @@ interface Props {
 
 export default function DocumentosPorEsfera({getData}: Props) { 
   const [data, setData] = useState<DataItem[]>([]);
-  const [ selectedItem, setSelectedItem ] = useState<string>('');
+  const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaEsfera() {
