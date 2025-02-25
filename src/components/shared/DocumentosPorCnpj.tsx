@@ -28,7 +28,7 @@ interface Props {
 
 export default function ConsultaPorCNPJ({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
-  const [ selectedItem, setSelectedItem ] = useState<string>('');
+  const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaCNPJ() {
@@ -56,8 +56,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
 
   useEffect(() => {
     consultaCNPJ();
-  }, []);  
-
+  }, []);
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
@@ -71,7 +70,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
 
     if (selectedItem === nome) {
       resp = await getData("", "", "");
-      setSelectedItem('');
+      setSelectedItem("");
     } else {
       resp = await getData("", "", nome);
       setSelectedItem(nome);
@@ -98,13 +97,13 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   ];
 
   const filteredData = selectedItem
-  ? data.filter((item) => item.name === selectedItem)
-  : data;
-const selectedColor = selectedItem
-  ? colors[
-      data.findIndex((item) => item.name === selectedItem) % colors.length
-    ]
-  : colors[0];
+    ? data.filter((item) => item.name === selectedItem)
+    : data;
+  const selectedColor = selectedItem
+    ? colors[
+        data.findIndex((item) => item.name === selectedItem) % colors.length
+      ]
+    : colors[0];
 
   return (
     <Card>

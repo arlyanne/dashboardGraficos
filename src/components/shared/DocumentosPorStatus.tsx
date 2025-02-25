@@ -15,34 +15,33 @@ interface DataItem {
 }
 
 interface Props {
-  getData: (status: string, esfera: string, cnpj: string) => any
+  getData: (status: string, esfera: string, cnpj: string) => any;
 }
 
-export default function DocumentosPorStatus({getData}: Props) {
+export default function DocumentosPorStatus({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
   const [totalDocumentos, setTotalDocumentos] = useState(0);
-  const [ selectedItem, setSelectedItem ] = useState<string>('');
+  const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function dadosStatusTotal() {
-   
     try {
-      const response = await getData("", "", "") 
-      setDataItemFilter(response)
+      const response = await getData("", "", "");
+      setDataItemFilter(response);
     } catch (error) {
       console.error("Erro ao buscar os dados", error);
     }
   }
 
-  function montarGrafico(filter: any){
-    const contagem = filter.reduce((acc: any, { OPCAO }:any) => {
+  function montarGrafico(filter: any) {
+    const contagem = filter.reduce((acc: any, { OPCAO }: any) => {
       acc[OPCAO] = (acc[OPCAO] || 0) + 1;
       return acc;
     }, {});
-  
-    const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({ 
-      name, 
-      value: value as number 
+
+    const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({
+      name,
+      value: value as number,
     }));
 
     const totalDocumentos = lista.reduce(
@@ -54,7 +53,6 @@ export default function DocumentosPorStatus({getData}: Props) {
     setTotalDocumentos(totalDocumentos);
   }
 
-
   useEffect(() => {
     dadosStatusTotal();
   }, []);
@@ -64,19 +62,19 @@ export default function DocumentosPorStatus({getData}: Props) {
       montarGrafico(dataItemFilter);
     }
   }, [dataItemFilter, selectedItem]);
-  
+
   async function handleClick(data: any) {
     const nome = data.name;
     let resp;
-  
+
     if (selectedItem === nome) {
-      resp = await getData('', '', '');
-      setSelectedItem('');
+      resp = await getData("", "", "");
+      setSelectedItem("");
     } else {
-      resp = await getData(nome, '', '');
-      setSelectedItem(nome)
+      resp = await getData(nome, "", "");
+      setSelectedItem(nome);
     }
-  
+
     setDataItemFilter(resp); // Atualiza a variável global do contexto
   }
 
@@ -90,7 +88,6 @@ export default function DocumentosPorStatus({getData}: Props) {
       setTotalDocumentos(data.reduce((acc, item) => acc + item.value, 0));
     }
   }, [selectedItem, data]); // Dependências: atualiza sempre que selectedItem ou data mudar
-  
 
   const chartConfig = {
     QUANTIDADE: {
