@@ -10,7 +10,7 @@ import { useSelection } from "@/context/SelectionContext";
 import { useEffect, useState } from "react";
 
 interface Props {
-  getData: (status: string, esfera: string, cnpj: string) => any
+  getData: (status: string, esfera: string, cnpj: string) => any;
 }
 
 interface DataItem {
@@ -24,18 +24,17 @@ interface DataItem {
   OBS: string;
 }
 
-export default function DocumentosTabela({getData}: Props) {
+export default function DocumentosTabela({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function DadosPlanilhaCompletos() {
     if (isLoading) return; // Evita chamadas simultâneas
     setIsLoading(true); // Inicia o carregamento
     try {
-      const response = await getData('', '', '');
+      const response = await getData("", "", "");
       if (response) {
-        
         setDataItemFilter(response);
       } else {
         console.error("A resposta da API foi indefinida");
@@ -53,7 +52,6 @@ export default function DocumentosTabela({getData}: Props) {
 
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
-      console.log("Dados recebidos para a tabela:", dataItemFilter);
       const formattedData = dataItemFilter.map((item: any) => ({
         CNPJ: item.CNPJ,
         DOC: item.DOC,
@@ -78,7 +76,6 @@ export default function DocumentosTabela({getData}: Props) {
     const segundo = dataString.slice(15, 17);
     return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
   }
-
 
   return (
     <Table className="table-auto">

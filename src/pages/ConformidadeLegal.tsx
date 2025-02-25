@@ -7,28 +7,40 @@ import { fetchQuery } from "@/lib/query";
 
 export default function ConformidadeLegal() {
   async function getData(status: string, esfera: string, cnpj: string) {
-
-
     let consulta = `
             SELECT 
-                COALESCE(CNPJ, '') AS CNPJ, 
-                COALESCE(DOC, '') AS DOC, 
-                COALESCE(ORG, '') AS ORG, 
-                COALESCE(SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'ESFERA', ESFERA), '') AS NOME_COMPLETO, 
-                COALESCE(DTEMI, '') AS DTEMI, 
-                COALESCE(DTVENC, '') AS DTVENC, 
-                COALESCE(SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'STATUS', STATUS), '') AS OPCAO, 
-                COALESCE(OBS, '') AS OBS  
-            FROM 
-                AD_TGFASSUNTOREG 
-                ${status ? " WHERE STATUS = '" + status +"'" : ""}
-                ${esfera ? " WHERE ESFERA = '" + esfera + "'" : ""}
-                ${cnpj ? " WHERE CNPJ = '" + cnpj +"'" : ""}
+    COALESCE(CNPJ, '') AS CNPJ, 
+    COALESCE(DOC, '') AS DOC, 
+    COALESCE(ORG, '') AS ORG, 
+    COALESCE(SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'ESFERA', ESFERA), '') AS NOME_COMPLETO, 
+    COALESCE(DTEMI, '') AS DTEMI, 
+    COALESCE(DTVENC, '') AS DTVENC, 
+    COALESCE(SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'STATUS', STATUS), '') AS OPCAO, 
+    COALESCE(OBS, '') AS OBS  
+FROM 
+    AD_TGFASSUNTOREG 
+WHERE 
+    (${
+      status
+        ? "SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'STATUS', STATUS) = '" +
+          status +
+          "'"
+        : "1=1"
+    }) 
+    AND (${
+      esfera
+        ? "SANKHYA.OPTION_LABEL('AD_TGFASSUNTOREG', 'ESFERA', ESFERA) = '" +
+          esfera +
+          "'"
+        : "1=1"
+    }) 
+    AND (${cnpj ? "CNPJ = '" + cnpj + "'" : "1=1"})
+
 
         `;
     try {
       const response = await fetchQuery(consulta);
-      console.log("Dados recebidos:", response)
+      // console.log("Dados recebidos:", consulta);
       return response;
     } catch (error) {
       console.error("Erro ao buscar os dados", error);

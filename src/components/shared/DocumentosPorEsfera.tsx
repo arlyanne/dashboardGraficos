@@ -1,7 +1,12 @@
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, CartesianGrid, LabelList, Cell } from "recharts";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { useSelection } from "@/context/SelectionContext";
 
 interface DataItem {
@@ -10,21 +15,20 @@ interface DataItem {
 }
 
 interface Props {
-  getData: (status: string, esfera: string, cnpj: string) => any
+  getData: (status: string, esfera: string, cnpj: string) => any;
 }
 
-export default function DocumentosPorEsfera({getData}: Props) { 
+export default function DocumentosPorEsfera({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
 
   async function consultaEsfera() {
-
     try {
       const response = await getData("", "", "");
       setDataItemFilter(response);
     } catch (error) {
-      console.error('Erro ao buscar dados', error);
+      console.error("Erro ao buscar dados", error);
     }
   }
 
@@ -55,12 +59,11 @@ export default function DocumentosPorEsfera({getData}: Props) {
   async function handleClick(data: any) {
     const nome = data.name;
     let resp;
-
     if (selectedItem === nome) {
-      resp = await getData('', '', '');
-      setSelectedItem('');
+      resp = await getData("", "", "");
+      setSelectedItem("");
     } else {
-      resp = await getData('', nome, '');
+      resp = await getData("", nome, "");
       setSelectedItem(nome);
     }
 
@@ -93,19 +96,17 @@ export default function DocumentosPorEsfera({getData}: Props) {
       ]
     : colors[0];
 
-    
   return (
     <Card>
       <CardHeader className="items-center pb-0">
         <CardTitle>Documentos por Esfera</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-          <BarChart
-            accessibilityLayer
-            data={filteredData}
-            margin={{ top: 20 }}
-          >
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
+          <BarChart accessibilityLayer data={filteredData} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="name"
@@ -116,7 +117,10 @@ export default function DocumentosPorEsfera({getData}: Props) {
                 value.length > 10 ? `${value.slice(0, 10)}...` : value
               }
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
 
             <Bar dataKey="value" onClick={(entry) => handleClick(entry)}>
               {filteredData.map((entry: any, index: any) => (
@@ -129,7 +133,12 @@ export default function DocumentosPorEsfera({getData}: Props) {
                   }
                 />
               ))}
-              <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
+              <LabelList
+                position="top"
+                offset={12}
+                className="fill-foreground"
+                fontSize={12}
+              />
             </Bar>
           </BarChart>
         </ChartContainer>
