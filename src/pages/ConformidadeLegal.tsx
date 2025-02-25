@@ -51,14 +51,14 @@ WHERE
     <div className="w-full h-full min-h-screen flex flex-col bg-[#10274C]">
       <img src={logo} alt="Logo" className="mx-auto my-2 w-40 h-auto" />
       <div className="mx-auto p-4 bg-gray-200 flex-grow w-full">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="flex-1 h-full bg-white p-4 shadow rounded">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+          <div className="col-span-12 md:col-span-4 h-full bg-white p-4 shadow rounded">
             <DocumentosPorStatus getData={getData} />
           </div>
-          <div className="flex-1 h-full bg-white p-4 shadow rounded">
+          <div className="col-span-12 md:col-span-4 h-full bg-white p-4 shadow rounded">
             <DocumentosPorCnpj getData={getData} />
           </div>
-          <div className="flex-1 h-full bg-white p-4 shadow rounded">
+          <div className="col-span-12 md:col-span-4 h-full bg-white p-4 shadow rounded">
             <DocumentosPorEsfera getData={getData} />
           </div>
         </div>

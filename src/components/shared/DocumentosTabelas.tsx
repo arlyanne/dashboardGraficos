@@ -110,7 +110,7 @@ export default function DocumentosTabela({ getData }: Props) {
       <TableBody>
         {data.map((item, index) => (
           <TableRow
-            key={item.CNPJ}
+            key={index}
             className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
           >
             <TableCell className="text-center">{item.CNPJ}</TableCell>
