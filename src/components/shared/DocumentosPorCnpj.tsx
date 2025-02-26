@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -20,6 +20,7 @@ import { useSelection } from "@/context/SelectionContext";
 interface DataItem {
   name: string;
   value: number;
+  color?: string;
 }
 
 interface Props {
@@ -30,6 +31,20 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
+
+  // Mapeamento persistente de cores
+  const colorMap = useRef<Map<string, string>>(new Map());
+
+  const colors = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff8042",
+    "#8dd1e1",
+    "#a4de6c",
+    "#d0ed57",
+    "#f4e1d2",
+  ];
 
   async function consultaCNPJ() {
     try {
@@ -46,10 +61,17 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
       return acc;
     }, {});
 
-    const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({
-      name,
-      value: value as number,
-    }));
+    const lista: DataItem[] = Object.entries(contagem).map(([name, value], index) => {
+      // Se o item já tem cor, reutiliza
+      if (!colorMap.current.has(name)) {
+        colorMap.current.set(name, colors[index % colors.length]);
+      }
+      return {
+        name,
+        value: value as number,
+        color: colorMap.current.get(name), // Atribui a cor já armazenada
+      };
+    });
 
     setData(lista);
   }
@@ -79,31 +101,20 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
     setDataItemFilter(resp); // Atualiza a variavel global
   }
 
+
+  useEffect(() => {
+   // console.log(data)
+  },[data])
+
   const chartConfig = {
     QUANTIDADE: {
       label: "QUANTIDADE",
     },
   } satisfies ChartConfig;
 
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#8dd1e1",
-    "#a4de6c",
-    "#d0ed57",
-    "#f4e1d2",
-  ];
-
   const filteredData = selectedItem
     ? data.filter((item) => item.name === selectedItem)
     : data;
-  const selectedColor = selectedItem
-    ? colors[
-        data.findIndex((item) => item.name === selectedItem) % colors.length
-      ]
-    : colors[0];
 
   return (
     <Card>
@@ -113,7 +124,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
       <CardContent>
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-[375px] w-full"
           style={{ width: "100%", maxWidth: "600px" }}
         >
           <BarChart
@@ -147,11 +158,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
               {filteredData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={
-                    selectedItem === entry.name
-                      ? selectedColor ?? colors[index % colors.length]
-                      : colors[index % colors.length]
-                  }
+                  fill={entry.color}
                 />
               ))}
               <LabelList

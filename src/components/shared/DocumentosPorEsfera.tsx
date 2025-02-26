@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, CartesianGrid, LabelList, Cell } from "recharts";
 import {
@@ -12,6 +12,7 @@ import { useSelection } from "@/context/SelectionContext";
 interface DataItem {
   name: string;
   value: number;
+  color?: string;
 }
 
 interface Props {
@@ -20,28 +21,49 @@ interface Props {
 
 export default function DocumentosPorEsfera({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
+  const [selectedItem, setSelectedItem] = useState<string>("");
 
-  async function consultaEsfera() {
+   // Mapeamento persistente de cores
+    const colorMap = useRef<Map<string, string>>(new Map());
+  
+    const colors = [
+      "#8884d8",
+      "#82ca9d",
+      "#ffc658",
+      "#ff8042",
+      "#8dd1e1",
+      "#a4de6c",
+      "#d0ed57",
+      "#f4e1d2",
+    ];
+
+  async function consultaEsfera(esfera: string = "") {
     try {
-      const response = await getData("", "", "");
+      const response = await getData("", esfera, "");
       setDataItemFilter(response);
     } catch (error) {
       console.error("Erro ao buscar dados", error);
     }
   }
 
-  function mostrarGrafico(filter: any) {
-    const contagem = filter.reduce((acc: any, { NOME_COMPLETO }: any) => {
+  function processarDados(filter: any) {
+    const contagem = filter.reduce((acc: Record<string, number>, { NOME_COMPLETO }: any) => {
       acc[NOME_COMPLETO] = (acc[NOME_COMPLETO] || 0) + 1;
       return acc;
     }, {});
 
-    const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({
-      name,
-      value: value as number,
-    }));
+    const lista: DataItem[] = Object.entries(contagem).map(([name, value], index) => {
+      // Se o item já tem cor, reutiliza
+      if (!colorMap.current.has(name)) {
+        colorMap.current.set(name, colors[index % colors.length]);
+      }
+      return {
+        name,
+        value: value as number,
+        color: colorMap.current.get(name), // Atribui a cor já armazenada
+      };
+    });
 
     setData(lista);
   }
@@ -50,25 +72,25 @@ export default function DocumentosPorEsfera({ getData }: Props) {
     consultaEsfera();
   }, []);
 
+
+  useEffect(() => {
+   // console.log(data)
+  },[data])
+
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
-      mostrarGrafico(dataItemFilter);
+      processarDados(dataItemFilter);
     }
-  }, [dataItemFilter, selectedItem]);
+  }, [dataItemFilter]);
 
-  async function handleClick(data: any) {
-    const nome = data.name;
-    let resp;
-    if (selectedItem === nome) {
-      resp = await getData("", "", "");
-      setSelectedItem("");
-    } else {
-      resp = await getData("", nome, "");
-      setSelectedItem(nome);
-    }
-
-    setDataItemFilter(resp); // Atualiza a variável global do contexto
+  async function handleClick(entry: DataItem) {
+    const novoItem = selectedItem === entry.name ? "" : entry.name;
+    setSelectedItem(novoItem);
+    await consultaEsfera(novoItem);
   }
+
+  const filteredData = selectedItem ? data.filter((item) => item.name === selectedItem) : data;
+
 
   const chartConfig = {
     QUANTIDADE: {
@@ -76,69 +98,31 @@ export default function DocumentosPorEsfera({ getData }: Props) {
     },
   } satisfies ChartConfig;
 
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#8dd1e1",
-    "#a4de6c",
-    "#d0ed57",
-    "#f4e1d2",
-  ];
-
-  const filteredData = selectedItem
-    ? data.filter((item) => item.name === selectedItem)
-    : data;
-  const selectedColor = selectedItem
-    ? colors[
-        data.findIndex((item) => item.name === selectedItem) % colors.length
-      ]
-    : colors[0];
-
   return (
     <Card>
       <CardHeader className="items-center pb-0">
         <CardTitle>Documentos por Esfera</CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <BarChart accessibilityLayer data={filteredData} margin={{ top: 20 }}>
+        <ChartContainer config={chartConfig} className="aspect-auto h-[385px] w-full">
+          <BarChart data={filteredData} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="name"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) =>
-                value.length > 10 ? `${value.slice(0, 10)}...` : value
-              }
+              tickFormatter={(value) => (value.length > 10 ? `${value.slice(0, 10)}...` : value)}
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-
-            <Bar dataKey="value" onClick={(entry) => handleClick(entry)}>
-              {filteredData.map((entry: any, index: any) => (
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <Bar dataKey="value" onClick={handleClick}>
+              {filteredData.map((entry, index) => (
                 <Cell
-                  key={`cell-${index}`}
-                  fill={
-                    selectedItem === entry.name
-                      ? selectedColor ?? colors[index % colors.length]
-                      : colors[index % colors.length]
-                  }
+                  key={entry.name}
+                  fill={entry.color}
                 />
               ))}
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
+              <LabelList position="top" offset={12} className="fill-foreground" fontSize={12} />
             </Bar>
           </BarChart>
         </ChartContainer>

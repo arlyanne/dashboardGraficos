@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Label, Cell } from "recharts";
 import {
@@ -12,6 +12,7 @@ import { useSelection } from "@/context/SelectionContext";
 interface DataItem {
   name: string;
   value: number;
+  color?: string;
 }
 
 interface Props {
@@ -23,6 +24,20 @@ export default function DocumentosPorStatus({ getData }: Props) {
   const [totalDocumentos, setTotalDocumentos] = useState(0);
   const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
+
+  // Mapeamento persistente de cores
+  const colorMap = useRef<Map<string, string>>(new Map());
+
+  const colors = [
+    "#8884d8",
+    "#82ca9d",
+    "#ffc658",
+    "#ff8042",
+    "#8dd1e1",
+    "#a4de6c",
+    "#d0ed57",
+    "#f4e1d2",
+  ];
 
   async function dadosStatusTotal() {
     try {
@@ -39,15 +54,19 @@ export default function DocumentosPorStatus({ getData }: Props) {
       return acc;
     }, {});
 
-    const lista: DataItem[] = Object.entries(contagem).map(([name, value]) => ({
-      name,
-      value: value as number,
-    }));
+    const lista: DataItem[] = Object.entries(contagem).map(([name, value], index) => {
+      // Se o item já tem cor, reutiliza
+      if (!colorMap.current.has(name)) {
+        colorMap.current.set(name, colors[index % colors.length]);
+      }
+      return {
+        name,
+        value: value as number,
+        color: colorMap.current.get(name), // Atribui a cor já armazenada
+      };
+    });
 
-    const totalDocumentos = lista.reduce(
-      (acc: number, item: DataItem) => acc + item.value,
-      0
-    );
+    const totalDocumentos = lista.reduce((acc, item) => acc + item.value, 0);
 
     setData(lista);
     setTotalDocumentos(totalDocumentos);
@@ -61,7 +80,7 @@ export default function DocumentosPorStatus({ getData }: Props) {
     if (dataItemFilter && dataItemFilter.length > 0) {
       montarGrafico(dataItemFilter);
     }
-  }, [dataItemFilter, selectedItem]);
+  }, [dataItemFilter]);
 
   async function handleClick(data: any) {
     const nome = data.name;
@@ -75,19 +94,21 @@ export default function DocumentosPorStatus({ getData }: Props) {
       setSelectedItem(nome);
     }
 
-    setDataItemFilter(resp); // Atualiza a variável global do contexto
+    setDataItemFilter(resp);
   }
 
   useEffect(() => {
     if (selectedItem) {
-      // Se houver um item selecionado, pega apenas o valor desse item
       const selectedData = data.find((item) => item.name === selectedItem);
       setTotalDocumentos(selectedData ? selectedData.value : 0);
     } else {
-      // Se não houver seleção, soma todos os valores
       setTotalDocumentos(data.reduce((acc, item) => acc + item.value, 0));
     }
-  }, [selectedItem, data]); // Dependências: atualiza sempre que selectedItem ou data mudar
+  }, [selectedItem, data]);
+
+  useEffect(() => {
+  //  console.log(data)
+  },[data])
 
   const chartConfig = {
     QUANTIDADE: {
@@ -95,31 +116,16 @@ export default function DocumentosPorStatus({ getData }: Props) {
     },
   } satisfies ChartConfig;
 
-  const colors = [
-    "#8884d8",
-    "#82ca9d",
-    "#ffc658",
-    "#ff8042",
-    "#8dd1e1",
-    "#a4de6c",
-    "#d0ed57",
-    "#f4e1d2",
-  ];
-
   const filteredData = selectedItem
     ? data.filter((item) => item.name === selectedItem)
     : data;
 
-  const selectedColor = selectedItem
-    ? colors[
-        data.findIndex((item) => item.name === selectedItem) % colors.length
-      ]
-    : colors[0];
-
   return (
     <Card>
       <CardHeader className="items-center pb-4">
-        <CardTitle className="text-x1 font-semibold">Documentos por Status</CardTitle>
+        <CardTitle className="text-x1 font-semibold">
+          Documentos por Status
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-4 pt-4">
         <ChartContainer
@@ -139,14 +145,8 @@ export default function DocumentosPorStatus({ getData }: Props) {
               strokeWidth={5}
               onClick={(entry) => handleClick(entry)}
             >
-              {filteredData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={selectedItem === entry.name 
-                    ? selectedColor ?? colors[index % colors.length]  // Cor do item selecionado
-                    : colors[index % colors.length]  // Cor do item não selecionado
-                  }
-                />
+              {filteredData.map((e, index) => (
+                <Cell key={`cell-${index}`} fill={e.color} />
               ))}
               <Label
                 content={({ viewBox }) => {
@@ -180,15 +180,12 @@ export default function DocumentosPorStatus({ getData }: Props) {
             </Pie>
           </PieChart>
         </ChartContainer>
-        <div className="text-sm mt-4 grid grid-cols-3 gap-4">
+        <div className="text-sm mt-2 grid grid-cols-3 gap-4">
           {filteredData.slice(0, 3).map((entry, index) => (
-            <div
-              key={`legend-${index}`}
-              className="flex items-center space-x-2"
-            >
+            <div key={`legend-${index}`} className="flex items-center space-x-2">
               <div
                 className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: colors[index % colors.length] }}
+                style={{ backgroundColor: entry.color }}
               ></div>
               <span>
                 {entry.name}: {entry.value}
@@ -197,15 +194,10 @@ export default function DocumentosPorStatus({ getData }: Props) {
           ))}
           <div className="col-span-3 flex justify-center space-x-8 mt-4">
             {filteredData.slice(3).map((entry, index) => (
-              <div
-                key={`legend-${index + 3}`}
-                className="flex items-center space-x-2"
-              >
+              <div key={`legend-${index + 3}`} className="flex items-center space-x-2">
                 <div
                   className="w-4 h-4 rounded-full"
-                  style={{
-                    backgroundColor: colors[(index + 3) % colors.length],
-                  }}
+                  style={{ backgroundColor: entry.color }}
                 ></div>
                 <span>
                   {entry.name}: {entry.value}
