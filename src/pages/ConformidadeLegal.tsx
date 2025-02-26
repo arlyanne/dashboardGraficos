@@ -4,6 +4,7 @@ import DocumentosPorEsfera from "../components/shared/DocumentosPorEsfera";
 import DocumentosTabela from "../components/shared/DocumentosTabelas";
 import logo from "../assets/logo.png";
 import { fetchQuery } from "@/lib/query";
+//import { dadosMocados } from "@/assets/mock";
 
 export default function ConformidadeLegal() {
   async function getData(status: string, esfera: string, cnpj: string) {
@@ -42,6 +43,7 @@ WHERE
       const response = await fetchQuery(consulta);
       // console.log("Dados recebidos:", consulta);
       return response;
+      //return dadosMocados(status, esfera, cnpj);
     } catch (error) {
       console.error("Erro ao buscar os dados", error);
     }
