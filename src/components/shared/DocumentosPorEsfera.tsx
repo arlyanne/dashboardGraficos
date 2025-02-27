@@ -83,6 +83,7 @@ export default function DocumentosPorEsfera({ getData }: Props) {
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
       processarDados(dataItemFilter);
+      setSelectedItem("")
     }
   }, [dataItemFilter]);
 

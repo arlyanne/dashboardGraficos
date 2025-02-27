@@ -84,6 +84,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   useEffect(() => {
     if (dataItemFilter && dataItemFilter.length > 0) {
       montarGrafico(dataItemFilter);
+      setSelectedItem("")
     }
   }, [dataItemFilter, selectedItem]);
 
