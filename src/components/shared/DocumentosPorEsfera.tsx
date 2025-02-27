@@ -22,6 +22,7 @@ export default function DocumentosPorEsfera({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
   const { dataItemFilter, setDataItemFilter } = useSelection();
   const [selectedItem, setSelectedItem] = useState<string>("");
+  const [ filtered, setFiltered ] = useState<boolean>(false);
 
   // Mapeamento persistente de cores
   const colorMap = useRef<Map<string, string>>(new Map());
@@ -87,10 +88,22 @@ export default function DocumentosPorEsfera({ getData }: Props) {
     }
   }, [dataItemFilter]);
 
-  async function handleClick(entry: DataItem) {
-    const novoItem = selectedItem === entry.name ? "" : entry.name;
-    setSelectedItem(novoItem);
-    await consultaEsfera(novoItem);
+  async function handleClick(data: any) {
+    const nome = data.name;
+    let resp;
+
+    if (filtered) {
+      resp = await getData("", "", "");
+      setSelectedItem("");
+      setFiltered(false)
+    } else {
+      resp = await getData("", nome, "");
+      setSelectedItem(nome);
+      setFiltered(true)
+
+    }
+
+    setDataItemFilter(resp);
   }
 
   const filteredData = selectedItem

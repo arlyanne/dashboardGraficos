@@ -30,6 +30,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   const [data, setData] = useState<DataItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<string>("");
   const { dataItemFilter, setDataItemFilter } = useSelection();
+  const [ filtered, setFiltered ] = useState<boolean>(false);
 
   // Mapeamento persistente de cores
   const colorMap = useRef<Map<string, string>>(new Map());
@@ -92,12 +93,15 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
     const nome = data.name;
     let resp;
 
-    if (selectedItem === nome) {
+    if (filtered) {
       resp = await getData("", "", "");
       setSelectedItem("");
+      setFiltered(false)
     } else {
       resp = await getData("", "", nome);
       setSelectedItem(nome);
+      setFiltered(true)
+
     }
 
     setDataItemFilter(resp); // Atualiza a variavel global
