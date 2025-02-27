@@ -13,7 +13,6 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useSelection } from "@/context/SelectionContext";
 
@@ -61,17 +60,19 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
       return acc;
     }, {});
 
-    const lista: DataItem[] = Object.entries(contagem).map(([name, value], index) => {
-      // Se o item já tem cor, reutiliza
-      if (!colorMap.current.has(name)) {
-        colorMap.current.set(name, colors[index % colors.length]);
+    const lista: DataItem[] = Object.entries(contagem).map(
+      ([name, value], index) => {
+        // Se o item já tem cor, reutiliza
+        if (!colorMap.current.has(name)) {
+          colorMap.current.set(name, colors[index % colors.length]);
+        }
+        return {
+          name,
+          value: value as number,
+          color: colorMap.current.get(name), // Atribui a cor já armazenada
+        };
       }
-      return {
-        name,
-        value: value as number,
-        color: colorMap.current.get(name), // Atribui a cor já armazenada
-      };
-    });
+    );
 
     setData(lista);
   }
@@ -101,10 +102,9 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
     setDataItemFilter(resp); // Atualiza a variavel global
   }
 
-
   useEffect(() => {
-   // console.log(data)
-  },[data])
+    // console.log(data)
+  }, [data]);
 
   const chartConfig = {
     QUANTIDADE: {
@@ -119,7 +119,9 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
   return (
     <Card>
       <CardHeader className="items-center pb-4">
-        <CardTitle>Documentos por CNPJ</CardTitle>
+        <CardTitle className="text-2xl font-semibold text-gray-600 my-2">
+          Documentos por CNPJ
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer
@@ -145,9 +147,35 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
             />
             <XAxis dataKey="value" type="number" hide />
             <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
+              cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const { name, value, color } = payload[0].payload; // Obtém a cor do item
+                  return (
+                    <div className="p-2 border rounded shadow-md text-xs text-foreground flex items-center gap-2 bg-white">
+                      {/* Quadrado colorido */}
+                      <span
+                        className="w-3 h-3 rounded-sm"
+                        style={{ backgroundColor: color }}
+                      ></span>
+
+                      <div>
+                        <p>
+                          <strong>Filial: </strong>
+                          {name}
+                        </p>
+                        <p>
+                          <strong>Qtd.: </strong>
+                          {value}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
             />
+
             <Bar
               dataKey="value"
               layout="vertical"
@@ -156,10 +184,7 @@ export default function ConsultaPorCNPJ({ getData }: Props) {
               onClick={(entry) => handleClick(entry)}
             >
               {filteredData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={entry.color}
-                />
+                <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
               <LabelList
                 dataKey="name"

@@ -78,31 +78,31 @@ export default function DocumentosTabela({ getData }: Props) {
   }
 
   return (
-    <Table className="table-auto">
+    <Table className="table-auto w-full border-collapse">
       <TableHeader>
         <TableRow className="bg-[#10274C] text-lg">
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Planta
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Documento
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Org. Responsável
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Esfera Governamental
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Data Emissão
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Data Vencimento
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Status Real
           </TableHead>
-          <TableHead className="text-center font-bold text-white">
+          <TableHead className="text-center font-semibold text-white px-4 py-3">
             Observação
           </TableHead>
         </TableRow>
@@ -111,16 +111,18 @@ export default function DocumentosTabela({ getData }: Props) {
         {data.map((item, index) => (
           <TableRow
             key={index}
-            className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+            className={`text-center ${
+              index % 2 === 0 ? "bg-gray-60" : "bg-white"
+            } hover:bg-gray-100 transition-all`}
           >
-            <TableCell className="text-center">{item.CNPJ}</TableCell>
-            <TableCell className="text-center">{item.DOC}</TableCell>
-            <TableCell className="text-center">{item.ORG}</TableCell>
-            <TableCell className="text-center">{item.NOME_COMPLETO}</TableCell>
-            <TableCell className="text-center">{item.DTEMI}</TableCell>
-            <TableCell className="text-center">{item.DTVENC}</TableCell>
-            <TableCell className="text-center">{item.OPCAO}</TableCell>
-            <TableCell>{item.OBS}</TableCell>
+            <TableCell className="px-4 py-3">{item.CNPJ}</TableCell>
+            <TableCell className="px-4 py-3">{item.DOC}</TableCell>
+            <TableCell className="px-4 py-3">{item.ORG}</TableCell>
+            <TableCell className="px-4 py-3">{item.NOME_COMPLETO}</TableCell>
+            <TableCell className="px-4 py-3">{item.DTEMI}</TableCell>
+            <TableCell className="px-4 py-3">{item.DTVENC}</TableCell>
+            <TableCell className="px-4 py-3">{item.OPCAO}</TableCell>
+            <TableCell className="px-4 py-3">{item.OBS}</TableCell>
           </TableRow>
         ))}
       </TableBody>

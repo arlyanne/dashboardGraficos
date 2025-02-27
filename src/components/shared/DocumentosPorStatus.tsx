@@ -5,7 +5,6 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { useSelection } from "@/context/SelectionContext";
 
@@ -54,17 +53,19 @@ export default function DocumentosPorStatus({ getData }: Props) {
       return acc;
     }, {});
 
-    const lista: DataItem[] = Object.entries(contagem).map(([name, value], index) => {
-      // Se o item já tem cor, reutiliza
-      if (!colorMap.current.has(name)) {
-        colorMap.current.set(name, colors[index % colors.length]);
+    const lista: DataItem[] = Object.entries(contagem).map(
+      ([name, value], index) => {
+        // Se o item já tem cor, reutiliza
+        if (!colorMap.current.has(name)) {
+          colorMap.current.set(name, colors[index % colors.length]);
+        }
+        return {
+          name,
+          value: value as number,
+          color: colorMap.current.get(name), // Atribui a cor já armazenada
+        };
       }
-      return {
-        name,
-        value: value as number,
-        color: colorMap.current.get(name), // Atribui a cor já armazenada
-      };
-    });
+    );
 
     const totalDocumentos = lista.reduce((acc, item) => acc + item.value, 0);
 
@@ -107,8 +108,8 @@ export default function DocumentosPorStatus({ getData }: Props) {
   }, [selectedItem, data]);
 
   useEffect(() => {
-  //  console.log(data)
-  },[data])
+    //  console.log(data)
+  }, [data]);
 
   const chartConfig = {
     QUANTIDADE: {
@@ -122,20 +123,45 @@ export default function DocumentosPorStatus({ getData }: Props) {
 
   return (
     <Card>
-      <CardHeader className="items-center pb-4">
-        <CardTitle className="text-x1 font-semibold">
+      <CardHeader className="items-center pb-0">
+        <CardTitle className="text-2xl font-semibold text-gray-600 my-2">
           Documentos por Status
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-4 pt-4">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-[285px] w-full"
         >
           <PieChart>
             <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              cursor={{ fill: "rgba(0, 0, 0, 0.1)" }}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  const { name, value, color } = payload[0].payload; // Obtém a cor do item
+                  return (
+                    <div className="p-2 border rounded shadow-md text-xs text-foreground flex items-center gap-2 bg-white">
+                      {/* Quadrado colorido */}
+                      <span
+                        className="w-3 h-3 rounded-sm"
+                        style={{ backgroundColor: color }}
+                      ></span>
+
+                      <div>
+                        <p>
+                          <strong>Status: </strong>
+                          {name}
+                        </p>
+                        <p>
+                          <strong>Qtd.: </strong>
+                          {value}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
             />
             <Pie
               data={filteredData}
@@ -180,26 +206,33 @@ export default function DocumentosPorStatus({ getData }: Props) {
             </Pie>
           </PieChart>
         </ChartContainer>
-        <div className="text-sm mt-2 grid grid-cols-3 gap-4">
+        <div className="text-sm mt-4 flex flex-wrap justify-center gap-6">
           {filteredData.slice(0, 3).map((entry, index) => (
-            <div key={`legend-${index}`} className="flex items-center space-x-2">
+            <div
+              key={`legend-${index}`}
+              className="flex items-center space-x-3"
+            >
               <div
-                className="w-4 h-4 rounded-full"
+                className="w-5 h-5 rounded-full"
                 style={{ backgroundColor: entry.color }}
               ></div>
-              <span>
+              <span className="text-xs text-gray-500 font-normal">
                 {entry.name}: {entry.value}
               </span>
             </div>
           ))}
-          <div className="col-span-3 flex justify-center space-x-8 mt-4">
+
+          <div className="w-full flex justify-center space-x-8 mt-4">
             {filteredData.slice(3).map((entry, index) => (
-              <div key={`legend-${index + 3}`} className="flex items-center space-x-2">
+              <div
+                key={`legend-${index + 3}`}
+                className="flex items-center space-x-3"
+              >
                 <div
-                  className="w-4 h-4 rounded-full"
+                  className="w-5 h-5 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 ></div>
-                <span>
+                <span className="text-xs text-gray-500 font-normal">
                   {entry.name}: {entry.value}
                 </span>
               </div>
